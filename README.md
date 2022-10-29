@@ -39,24 +39,46 @@ cuales el proxy va a redirigir de la sigueinte manera
 Buff_size: Es el tamaño del buffer que se va a esperar a la hora de mandar
 y recibir peticiones.
 TTL: O time to live, es el tiempo maximo que una entrada permanecera en el
-cache.
+cache. El tiempo esta en minutos.
+
+### Balanceador de carga
+
+La tecnica para balancear carga que usamos fue *Round Robin* que dentro del
+codigo la implementamos como una operacion ternaria que nos devuelve el numero
+del servidor al cual vamos a redirigir una request especifica.
+
+### Cache
+
+Para el cache usamos un archivo *.txt* que almacena una relacion Request - Response
+que despues usamos para construir un diccionario dentro del codigo. Sobre este
+diccionario realizamos busquedas en las key para ver si una request entrante
+existe dentro del diccionario y asi evitarnos redirigir la peticion y esperar la
+respuesta del servidor. Cada entry dentro del archivo se borrara despues de haber
+pasado determinado tiempo que el usuario debe parametrizar en el archivo *.config*
+
+### Log
+
+Cada que se recibe una peticion o se manda un response, el proxy imprimira por
+consola y en un archivo de texto toda la informacion. De tal manera que se le
+ofrezca al usuario una fuente de trazabilidad en caso de que algo no vaya como
+es esperado.
 
 ### Proxy inverso
 
 El funcionamiento del codigo es de la siguiente forma, usamos *sockets* para
 escuchar en el puerto parametrizado las request de los clientes, una vez se
-establezca la conexion creamos un hilo para esa conexion (de manera tal que
-podamos soportar peticiones concurrentes). Cuando la conexion con el cliente es
-establecida recibimos la request y la analizamos, si esa request se encuentra
-en el cache no realizamos ningun redireccionamiento al server puesto que ya
-sabemos cual es el response que hay que enviar, si no se encuentra en el cache
-usamos el round robin para redirigir la peticion a uno de los servidores
-parametrizados. Una vez el server proceses la peticion y nos devuelva el
-response almacenamos esa request y ese response en el cache (que dentro del
-codigo representamos como un diccionario) luego le enviamos la response al cliente
-y quedamos atentos a posteriores peticiones. Asi se quedara el programa funcionando
-infinitamente hasta que el usuario mande un QUIT que es donde se finaliza la conexion
-con ese cliente y se cierra el hilo.
+establezca la conexion creamos un hilo de manera tal que podamos soportar
+peticiones concurrentes. Cuando la conexion con el cliente es establecida
+recibimos la request y la analizamos, si esa request se encuentra en el cache
+no realizamos ningun redireccionamiento al server puesto que ya sabemos cual es
+el response que hay que enviar, si no se encuentra en el cache usamos el round
+robin para redirigir la peticion a uno de los servidores parametrizados. Una
+vez el server proceses la peticion y nos devuelva el response almacenamos esa
+request y ese response en el cache (que dentro del codigo representamos como un
+diccionario) luego le enviamos la response al cliente y quedamos atentos a
+posteriores peticiones. Asi se quedara el programa funcionando infinitamente
+hasta que el usuario mande un QUIT que es donde se finaliza la conexion con ese
+cliente y se cierra el hilo.
 ### Justificacion del uso de Python
 
 Elegimos Python por encima de cualquier otro lenguaje simplemente porque
