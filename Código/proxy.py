@@ -1,6 +1,6 @@
 import socket
 from cache import start_cache
-from conection import ConexionCliente
+from conection import Conection
 
 params = {}
 
@@ -40,7 +40,7 @@ def start_server():
             print("Servidor listo y esperando")
             while True:
                 socketcliente, dircliente = servidor.accept()
-                thread_cliente = ConexionCliente(dircliente, socketcliente, params)
+                thread_cliente = Conection(dircliente, socketcliente, params)
                 thread_cliente.start()
     else:
         print("Por favor ingrese un archivo de configuracion")

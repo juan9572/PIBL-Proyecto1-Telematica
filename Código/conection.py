@@ -7,12 +7,12 @@ round_counter = -1
 def round_robin(size):
     global round_counter
     round_counter = (
-        0 if round_counter == size - 1 
+        0 if round_counter == size - 1
         else round_counter + 1
     )
     return round_counter
 
-class ConexionCliente(threading.Thread):
+class Conection(threading.Thread):
 
     def log(self, line):
         with open("log.txt", "a") as f:
@@ -46,7 +46,7 @@ class ConexionCliente(threading.Thread):
             parseRequest = request.decode("utf-8")
             if parseRequest:
                 cache.check_registers_cache("cache.txt", self.params)
-                request_line = parseRequest[:parseRequest.index('\n') - 1]    
+                request_line = parseRequest[:parseRequest.index('\n') - 1]
                 if request_line in cache.cache.keys():
                     response = cache.cache[request_line][1]
                 else:
